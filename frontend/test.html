@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Тест — ПДД Онлайн</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="nav-logo"><div class="logo-icon">🚗</div>ПДД Онлайн</a>
+  <div class="nav-right" id="navAuth"></div>
+</nav>
+
+<!-- TEST LAYOUT -->
+<div class="test-layout" id="testLayout" style="display:none">
+  <!-- Sidebar: question numbers -->
+  <div class="questions-sidebar">
+    <h4>Вопросы</h4>
+    <div class="q-grid" id="qGrid"></div>
+    <div style="margin-top:20px;padding-top:16px;border-top:2px solid var(--bg)">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--text-secondary)">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:12px;border-radius:3px;background:var(--success);display:inline-block"></span> Верно</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:12px;border-radius:3px;background:var(--danger);display:inline-block"></span> Ошибка</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:12px;height:12px;border-radius:3px;background:var(--primary);display:inline-block"></span> Текущий</span>
+      </div>
+    </div>
+    <div style="margin-top:20px">
+      <button class="btn btn-danger btn-full btn-sm" onclick="confirmFinish()">⏹ Завершить</button>
+    </div>
+  </div>
+
+  <!-- Main question area -->
+  <div class="test-main">
+    <div class="test-header">
+      <div>
+        <div class="test-title" id="testTitle">Загрузка...</div>
+        <div style="font-size:13px;color:var(--text-secondary);margin-top:3px" id="testSubtitle"></div>
+      </div>
+      <div id="timerBlock" style="display:none">
+        <div class="timer" id="timerDisplay">🕐 25:00</div>
+      </div>
+    </div>
+
+    <!-- Question -->
+    <div id="questionArea">
+      <div class="loader">⟳</div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="test-nav">
+      <button class="btn btn-outline" onclick="prevQ()" id="btnPrev" disabled>← Назад</button>
+      <span style="font-size:14px;color:var(--text-secondary)" id="qCounter">1 / 20</span>
+      <button class="btn btn-primary" onclick="nextQ()" id="btnNext">Далее →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="resultArea" style="display:none;padding:24px">
+  <div class="result-card">
+    <div style="font-size:48px;margin-bottom:16px" id="resultEmoji">🎉</div>
+    <div class="result-score" id="resultScore">0%</div>
+    <div class="result-label" id="resultLabel">Результат теста</div>
+    <div class="result-stats">
+      <div class="result-stat correct"><div class="r-num" id="rCorrect">0</div><div class="r-lbl">Верно</div></div>
+      <div class="result-stat wrong"><div class="r-num" id="rWrong">0</div><div class="r-lbl">Ошибок</div></div>
+      <div class="result-stat total"><div class="r-num" id="rTotal">0</div><div class="r-lbl">Всего</div></div>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+      <button class="btn btn-primary" onclick="restartTest()">🔄 Пройти снова</button>
+      <a href="profile.html" class="btn btn-outline">👤 Профиль</a>
+      <a href="index.html" class="btn btn-outline">🏠 Главная</a>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/app.js"></script>
+<script>
+initNav();
+
+const params = new URLSearchParams(location.search);
+const testId = params.get('id');
+const mode = params.get('mode') || 'ticket'; // ticket | exam | marathon | mistakes | topic
+
+let questions = [];
+let current = 0;
+let answers = {}; // index -> {chosen, correct}
+let timerInterval = null;
+let timeLeft = 25 * 60;
+
+document.addEventListener('DOMContentLoaded', initTest);
+
+async function initTest() {
+  try {
+    let url = '';
+    let title = '';
+
+    if (mode === 'exam') {
+      url = '/questions/random?limit=20';
+      title = 'Экзамен ПДД';
+      startTimer();
+    } else if (mode === 'marathon') {
+      url = '/questions/all';
+      title = 'Марафон';
+    } else if (mode === 'mistakes') {
+      url = '/mistakes/questions';
+      title = 'Работа над ошибками';
+    } else if (mode === 'topic') {
+      url = `/questions/by-topic/${encodeURIComponent(testId)}`;
+      title = 'Тема';
+    } else {
+      url = `/questions/by-test/${testId}`;
+      title = `Билет ${testId}`;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token && mode === 'mistakes') {
+      showToast('Войдите в аккаунт для просмотра ошибок', 'error');
+      setTimeout(() => window.location.href = 'login.html', 1500);
+      return;
+    }
+
+    questions = await api(url);
+
+    if (!questions.length) {
+      document.getElementById('testLayout').style.display = 'none';
+      document.body.innerHTML += `<div style="text-align:center;padding:60px">
+        <div style="font-size:60px">📭</div>
+        <h2 style="margin:16px 0 8px">Нет вопросов</h2>
+        <p style="color:var(--text-secondary);margin-bottom:24px">В этом разделе пока нет вопросов</p>
+        <a href="index.html" class="btn btn-primary">← На главную</a>
+      </div>`;
+      return;
+    }
+
+    document.getElementById('testTitle').textContent = title;
+    document.getElementById('testSubtitle').textContent = `${questions.length} вопросов`;
+    document.getElementById('testLayout').style.display = 'grid';
+
+    buildQGrid();
+    renderQuestion(0);
+  } catch(e) {
+    console.error(e);
+    document.body.innerHTML += `<div style="text-align:center;padding:60px">
+      <h2>⚠️ Ошибка загрузки</h2>
+      <p style="color:var(--text-secondary);margin:12px 0">Убедитесь, что сервер запущен на порту 3000</p>
+      <a href="index.html" class="btn btn-primary">← На главную</a>
+    </div>`;
+  }
+}
+
+function buildQGrid() {
+  const grid = document.getElementById('qGrid');
+  grid.innerHTML = questions.map((_, i) => `
+    <div class="q-num ${i === 0 ? 'current' : ''}" id="qn${i}" onclick="jumpTo(${i})">${i+1}</div>
+  `).join('');
+}
+
+function renderQuestion(idx) {
+  current = idx;
+  const q = questions[idx];
+  updateQGrid();
+
+  const ans = answers[idx];
+  const disabled = ans !== undefined;
+
+  const letters = ['А', 'Б', 'В', 'Г'];
+  const opts = [q.answer1, q.answer2, q.answer3, q.answer4].filter(Boolean);
+
+  let html = '';
+  if (q.image) {
+    html += `<img src="${q.image.startsWith('http') ? q.image : 'http://localhost:3000/uploads/'+q.image}" class="question-img" onerror="this.style.display='none'">`;
+  }
+  html += `<div class="question-text">${idx+1}. ${q.question}</div>`;
+  html += `<div class="answer-options">`;
+  opts.forEach((opt, i) => {
+    let cls = '';
+    if (ans !== undefined) {
+      if (i+1 === q.correct_answer) cls = 'correct';
+      else if (i+1 === ans.chosen) cls = 'wrong';
+      cls += ' disabled';
+    }
+    html += `
+      <div class="answer-option ${cls}" onclick="${disabled ? '' : `selectAnswer(${i+1})`}">
+        <div class="answer-letter">${letters[i]}</div>
+        <div class="answer-text">${opt}</div>
+      </div>`;
+  });
+  html += `</div>`;
+
+  if (ans !== undefined && q.description) {
+    html += `<div class="explanation-box show"><strong>💡 Пояснение:</strong> ${q.description}</div>`;
+  }
+
+  document.getElementById('questionArea').innerHTML = html;
+  document.getElementById('qCounter').textContent = `${idx+1} / ${questions.length}`;
+  document.getElementById('btnPrev').disabled = idx === 0;
+  document.getElementById('btnNext').textContent = idx === questions.length - 1 ? 'Завершить' : 'Далее →';
+}
+
+function selectAnswer(chosen) {
+  const q = questions[current];
+  const isCorrect = chosen === q.correct_answer;
+  answers[current] = { chosen, correct: isCorrect };
+
+  if (!isCorrect && localStorage.getItem('token')) {
+    // Save mistake
+    api('/mistakes/add', { method: 'POST', body: JSON.stringify({ question_id: q.id }) }).catch(() => {});
+  }
+
+  renderQuestion(current);
+
+  if (current === questions.length - 1) {
+    setTimeout(() => {}, 500);
+  }
+}
+
+function nextQ() {
+  if (current === questions.length - 1) {
+    confirmFinish();
+  } else {
+    renderQuestion(current + 1);
+  }
+}
+
+function prevQ() {
+  if (current > 0) renderQuestion(current - 1);
+}
+
+function jumpTo(idx) {
+  renderQuestion(idx);
+}
+
+function updateQGrid() {
+  questions.forEach((_, i) => {
+    const el = document.getElementById('qn' + i);
+    if (!el) return;
+    el.className = 'q-num';
+    if (i === current) el.classList.add('current');
+    if (answers[i] !== undefined) {
+      el.classList.add(answers[i].correct ? 'correct' : 'wrong');
+    }
+  });
+}
+
+function confirmFinish() {
+  const answered = Object.keys(answers).length;
+  if (answered < questions.length && mode !== 'marathon') {
+    if (!confirm(`Отвечено ${answered} из ${questions.length}. Завершить тест?`)) return;
+  }
+  finishTest();
+}
+
+async function finishTest() {
+  clearInterval(timerInterval);
+  const correct = Object.values(answers).filter(a => a.correct).length;
+  const wrong = Object.values(answers).filter(a => !a.correct).length;
+  const total = questions.length;
+  const score = total ? Math.round(correct / total * 100) : 0;
+
+  // Save result
+  if (localStorage.getItem('token')) {
+    try {
+      await api('/results/save', {
+        method: 'POST',
+        body: JSON.stringify({ test_id: testId || null, score, correct, wrong, title: document.getElementById('testTitle').textContent })
+      });
+    } catch(e) {}
+  }
+
+  // Show result
+  document.getElementById('testLayout').style.display = 'none';
+  document.getElementById('resultArea').style.display = 'block';
+  document.getElementById('resultScore').textContent = score + '%';
+  document.getElementById('rCorrect').textContent = correct;
+  document.getElementById('rWrong').textContent = wrong;
+  document.getElementById('rTotal').textContent = total;
+
+  if (score >= 75) {
+    document.getElementById('resultEmoji').textContent = '🎉';
+    document.getElementById('resultLabel').textContent = '✅ Тест сдан! Отличный результат!';
+    document.getElementById('resultLabel').style.color = 'var(--success)';
+  } else {
+    document.getElementById('resultEmoji').textContent = '😔';
+    document.getElementById('resultLabel').textContent = '❌ Тест не сдан. Нужно ≥75% правильных ответов';
+    document.getElementById('resultLabel').style.color = 'var(--danger)';
+  }
+}
+
+function restartTest() {
+  answers = {};
+  current = 0;
+  clearInterval(timerInterval);
+  document.getElementById('resultArea').style.display = 'none';
+  document.getElementById('testLayout').style.display = 'grid';
+  if (mode === 'exam') {
+    timeLeft = 25 * 60;
+    startTimer();
+  }
+  buildQGrid();
+  renderQuestion(0);
+}
+
+function startTimer() {
+  document.getElementById('timerBlock').style.display = 'block';
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    const m = Math.floor(timeLeft / 60);
+    const s = timeLeft % 60;
+    document.getElementById('timerDisplay').textContent = `🕐 ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    if (timeLeft <= 60) document.getElementById('timerDisplay').style.background = 'var(--danger)';
+    if (timeLeft <= 0) { clearInterval(timerInterval); finishTest(); }
+  }, 1000);
+}
+</script>
+</body>
+</html>

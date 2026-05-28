@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Учебник ПДД — ПДД Онлайн</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+/* ─── LEARN PAGE ─── */
+.learn-hero {
+  background: linear-gradient(135deg, #0D47A1 0%, #1565C0 60%, #1976D2 100%);
+  padding: 48px 24px 40px;
+  text-align: center;
+  color: #fff;
+}
+.learn-hero h1 { font-size: 28px; font-weight: 800; margin-bottom: 10px; }
+.learn-hero p  { font-size: 15px; opacity: .85; max-width: 520px; margin: 0 auto 24px; }
+
+.search-bar {
+  display: flex;
+  max-width: 480px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,.2);
+}
+.search-bar input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 13px 20px;
+  font-size: 14px;
+  color: var(--text);
+  background: transparent;
+}
+.search-bar button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 0 22px;
+  cursor: pointer;
+  font-size: 17px;
+  border-radius: 0 30px 30px 0;
+}
+
+/* ─── TABS ─── */
+.tab-bar {
+  display: flex;
+  gap: 8px;
+  padding: 20px 24px 0;
+  overflow-x: auto;
+  background: #fff;
+  border-bottom: 2px solid var(--border);
+  scrollbar-width: none;
+}
+.tab-bar::-webkit-scrollbar { display: none; }
+.tab-btn {
+  flex-shrink: 0;
+  padding: 10px 18px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.tab-btn:hover { color: var(--primary); background: var(--bg); }
+.tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: var(--bg); }
+
+/* ─── SIGN GRID ─── */
+.signs-section { padding: 28px 24px; }
+.category-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 18px;
+}
+.category-header h3 {
+  font-size: 18px; font-weight: 700; color: var(--text);
+}
+.cat-badge {
+  font-size: 11px; font-weight: 700; padding: 3px 10px;
+  border-radius: 20px; text-transform: uppercase; letter-spacing: .5px;
+}
+
+.signs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 14px;
+  margin-bottom: 36px;
+}
+.sign-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 18px 14px 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform .18s, box-shadow .18s;
+  border: 2px solid transparent;
+}
+.sign-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(21,101,192,.15);
+  border-color: var(--primary);
+}
+.sign-card.active { border-color: var(--primary); background: #EEF4FF; }
+
+/* SVG знак */
+.sign-svg-wrap {
+  width: 72px; height: 72px;
+  margin: 0 auto 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+.sign-svg-wrap svg { width: 100%; height: 100%; }
+
+.sign-number {
+  font-size: 10px; font-weight: 700; color: var(--text-light);
+  letter-spacing: .5px; margin-bottom: 5px;
+  text-transform: uppercase;
+}
+.sign-name {
+  font-size: 12px; font-weight: 600; color: var(--text);
+  line-height: 1.4; margin-bottom: 4px;
+}
+.sign-short {
+  font-size: 11px; color: var(--text-secondary); line-height: 1.4;
+}
+
+/* ─── MODAL ─── */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.55);
+  z-index: 1000;
+  align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: #fff;
+  border-radius: 20px;
+  max-width: 480px;
+  width: 100%;
+  padding: 32px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: popIn .2s ease;
+}
+@keyframes popIn { from { transform: scale(.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.modal-close {
+  position: absolute; top: 16px; right: 16px;
+  background: var(--bg); border: none; border-radius: 50%;
+  width: 32px; height: 32px; cursor: pointer;
+  font-size: 18px; color: var(--text-secondary);
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-close:hover { background: var(--border); }
+.modal-sign-big {
+  width: 110px; height: 110px; margin: 0 auto 20px;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-sign-big svg { width: 100%; height: 100%; }
+.modal-num { font-size: 12px; color: var(--text-light); text-align: center; margin-bottom: 6px; }
+.modal-title { font-size: 20px; font-weight: 800; color: var(--text); text-align: center; margin-bottom: 12px; }
+.modal-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px; }
+.modal-where h4 { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.modal-where ul { padding-left: 20px; }
+.modal-where li { font-size: 13px; color: var(--text-secondary); margin-bottom: 5px; line-height: 1.5; }
+.modal-fine {
+  margin-top: 16px; padding: 12px 16px;
+  background: #FFF3E0; border-radius: 10px; border-left: 4px solid var(--warning);
+}
+.modal-fine strong { font-size: 13px; color: var(--warning); display: block; margin-bottom: 3px; }
+.modal-fine span { font-size: 13px; color: #795548; }
+
+/* ─── RULES SECTION ─── */
+.rules-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 30px; }
+.rule-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  cursor: pointer;
+}
+.rule-head {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 20px;
+  transition: background .15s;
+}
+.rule-head:hover { background: var(--bg); }
+.rule-icon-wrap {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.rule-title { font-size: 15px; font-weight: 700; color: var(--text); flex: 1; }
+.rule-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.rule-chevron { font-size: 18px; color: var(--text-light); transition: transform .2s; }
+.rule-chevron.open { transform: rotate(90deg); }
+.rule-body { display: none; padding: 0 20px 20px; border-top: 1px solid var(--border); }
+.rule-body.open { display: block; }
+.rule-body p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-top: 14px; }
+.rule-body ul { padding-left: 20px; margin-top: 10px; }
+.rule-body li { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 4px; }
+.rule-body .highlight {
+  background: #E3F2FD; border-radius: 10px;
+  padding: 12px 16px; margin-top: 12px;
+  font-size: 13px; color: var(--primary-dark);
+  font-weight: 600;
+}
+
+/* ─── SPEEDS TABLE ─── */
+.speed-table {
+  width: 100%; border-collapse: collapse; margin-top: 14px;
+  border-radius: 10px; overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.speed-table th {
+  background: var(--primary); color: #fff;
+  padding: 11px 14px; font-size: 13px; text-align: left;
+}
+.speed-table td { padding: 11px 14px; font-size: 13px; border-bottom: 1px solid var(--border); }
+.speed-table tr:last-child td { border-bottom: none; }
+.speed-table tr:nth-child(even) td { background: var(--bg); }
+.speed-val { font-weight: 700; color: var(--primary); font-size: 16px; }
+
+/* ─── QUIZ ─── */
+.quiz-wrap { max-width: 600px; }
+.quiz-q { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 16px; line-height: 1.5; }
+.quiz-opts { display: flex; flex-direction: column; gap: 10px; }
+.quiz-opt {
+  padding: 13px 16px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text);
+  transition: all .15s;
+  display: flex; align-items: center; gap: 10px;
+}
+.quiz-opt:hover:not(.disabled) { border-color: var(--primary); background: #EEF4FF; }
+.quiz-opt.correct { border-color: var(--success); background: #E8F5E9; color: var(--success); }
+.quiz-opt.wrong   { border-color: var(--danger);  background: #FFEBEE; color: var(--danger); }
+.quiz-opt.disabled { cursor: default; }
+.quiz-letter {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--bg); font-weight: 700; font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.quiz-feedback {
+  margin-top: 14px; padding: 12px 16px; border-radius: 10px;
+  font-size: 14px; font-weight: 600; display: none;
+}
+.quiz-feedback.show { display: block; }
+.quiz-feedback.ok { background: #E8F5E9; color: var(--success); }
+.quiz-feedback.err { background: #FFEBEE; color: var(--danger); }
+.quiz-nav { display: flex; gap: 10px; margin-top: 18px; align-items: center; }
+.quiz-progress-text { font-size: 13px; color: var(--text-secondary); flex: 1; }
+.quiz-score { font-size: 13px; font-weight: 700; color: var(--primary); }
+
+/* ─── TAB PANELS ─── */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ─── PROGRESS BAR ─── */
+.learn-progress { 
+  background: var(--bg); padding: 14px 24px;
+  display: flex; align-items: center; gap: 14px;
+}
+.prog-bar { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.prog-fill { height: 100%; background: var(--success); border-radius: 4px; transition: width .4s; }
+.prog-label { font-size: 12px; color: var(--text-secondary); white-space: nowrap; }
+
+/* ─── EMPTY ─── */
+.no-results {
+  text-align: center; padding: 60px 20px;
+  color: var(--text-secondary);
+}
+.no-results .big { font-size: 48px; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="nav-logo">
+    <div class="logo-icon">🚗</div>ПДД Онлайн
+  </a>
+  <ul class="nav-menu">
+    <li><a href="index.html">Главная</a></li>
+    <li><a href="learn.html" class="active">Учебник</a></li>
+    <li><a href="tickets.html">Билеты</a></li>
+    <li><a href="exam.html">Экзамен</a></li>
+    <li><a href="mistakes.html">Ошибки</a></li>
+    <li><a href="rating.html">Рейтинг</a></li>
+  </ul>
+  <div class="nav-right" id="navAuth"></div>
+  <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">🏠 Главная</a>
+  <a href="learn.html">📖 Учебник</a>
+  <a href="tickets.html">📋 Билеты</a>
+  <a href="exam.html">📝 Экзамен</a>
+</div>
+
+<!-- HERO -->
+<div class="learn-hero">
+  <h1>📖 Учебник ПДД</h1>
+  <p>Изучите дорожные знаки, правила движения и скоростные ограничения перед тестом</p>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Поиск знака или правила..." oninput="doSearch(this.value)">
+    <button>🔍</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showTab('signs')" id="tabSigns">🚦 Дорожные знаки</button>
+  <button class="tab-btn" onclick="showTab('rules')" id="tabRules">📋 Правила движения</button>
+  <button class="tab-btn" onclick="showTab('speed')" id="tabSpeed">⚡ Скоростной режим</button>
+  <button class="tab-btn" onclick="showTab('quiz')" id="tabQuiz">🎯 Мини-тест знаков</button>
+</div>
+
+<!-- PROGRESS -->
+<div class="learn-progress">
+  <span class="prog-label" id="progLabel">Изучено: 0 знаков</span>
+  <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  <span class="prog-label" id="progPct">0%</span>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- TAB 1: ЗНАКИ -->
+<!-- ══════════════════════════════════════════ -->
+<div id="panel-signs" class="tab-panel active signs-section">
+
+  <!-- ЗАПРЕЩАЮЩИЕ -->
+  <div class="category-header">
+    <span style="font-size:24px">🔴</span>
+    <h3>Запрещающие знаки</h3>
+    <span class="cat-badge" style="background:#FFEBEE;color:#C62828">3.x</span>
+  </div>
+  <div class="signs-grid" id="grid-prohibit"></div>
+
+  <!-- ПРЕДУПРЕЖДАЮЩИЕ -->
+  <div class="category-header">
+    <span style="font-size:24px">⚠️</span>
+    <h3>Предупреждающие знаки</h3>
+    <span class="cat-badge" style="background:#FFF3E0;color:#E65100">1.x</span>
+  </div>
+  <div class="signs-grid" id="grid-warning"></div>
+
+  <!-- ПРЕДПИСЫВАЮЩИЕ -->
+  <div class="category-header">
+    <span style="font-size:24px">🔵</span>
+    <h3>Предписывающие знаки</h3>
+    <span class="cat-badge" style="background:#E3F2FD;color:#1565C0">4.x</span>
+  </div>
+  <div class="signs-grid" id="grid-mandatory"></div>
+
+  <!-- ИНФОРМАЦИОННЫЕ -->
+  <div class="category-header">
+    <span style="font-size:24px">🟦</span>
+    <h3>Информационные знаки</h3>
+    <span class="cat-badge" style="background:#E8F5E9;color:#2E7D32">5.x / 6.x</span>
+  </div>
+  <div class="signs-grid" id="grid-info"></div>
+
+  <!-- ПРИОРИТЕТ -->
+  <div class="category-header">
+    <span style="font-size:24px">🔷</span>
+    <h3>Знаки приоритета</h3>
+    <span class="cat-badge" style="background:#F3E5F5;color:#7B1FA2">2.x</span>
+  </div>
+  <div class="signs-grid" id="grid-priority"></div>
+
+  <div class="no-results" id="noResults" style="display:none">
+    <div class="big">🔍</div>
+    <p>Знак не найден. Попробуйте другой запрос.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- TAB 2: ПРАВИЛА -->
+<!-- ══════════════════════════════════════════ -->
+<div id="panel-rules" class="tab-panel signs-section">
+  <div class="rules-list" id="rulesList"></div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- TAB 3: СКОРОСТЬ -->
+<!-- ══════════════════════════════════════════ -->
+<div id="panel-speed" class="tab-panel signs-section">
+  <h3 style="margin-bottom:6px">⚡ Скоростной режим в КР</h3>
+  <p style="color:var(--text-secondary);font-size:14px;margin-bottom:20px">Максимально допустимая скорость движения согласно ПДД Кыргызской Республики</p>
+
+  <table class="speed-table">
+    <thead>
+      <tr><th>Тип дороги / место</th><th>Легковые авто</th><th>Грузовые / авт.</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>🏘️ В населённом пункте</td><td><span class="speed-val">60</span> км/ч</td><td><span class="speed-val">60</span> км/ч</td></tr>
+      <tr><td>🛣️ Вне населённого пункта</td><td><span class="speed-val">90</span> км/ч</td><td><span class="speed-val">70</span> км/ч</td></tr>
+      <tr><td>🏎️ Автомагистраль</td><td><span class="speed-val">110</span> км/ч</td><td><span class="speed-val">90</span> км/ч</td></tr>
+      <tr><td>🏫 Вблизи школы (при наличии знака)</td><td><span class="speed-val">20</span> км/ч</td><td><span class="speed-val">20</span> км/ч</td></tr>
+      <tr><td>🚧 В жилой зоне / дворе</td><td><span class="speed-val">20</span> км/ч</td><td><span class="speed-val">20</span> км/ч</td></tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top:28px">
+    <h3 style="margin-bottom:14px">⚠️ Штрафы за превышение скорости</h3>
+    <table class="speed-table">
+      <thead>
+        <tr><th>Превышение</th><th>Штраф</th><th>Лишение прав</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>До 20 км/ч</td><td>Предупреждение</td><td>—</td></tr>
+        <tr><td>20–40 км/ч</td><td>500–1000 сом</td><td>—</td></tr>
+        <tr><td>40–60 км/ч</td><td>2000–3000 сом</td><td>До 3 мес.</td></tr>
+        <tr><td>Более 60 км/ч</td><td>5000+ сом</td><td>До 1 года</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-top:28px">
+    <h3 style="margin-bottom:14px">🌧️ Скорость при разных условиях</h3>
+    <div class="rules-list">
+      <div class="rule-card">
+        <div class="rule-head" onclick="toggleRule(this)">
+          <div class="rule-icon-wrap" style="background:#E3F2FD">🌧️</div>
+          <div><div class="rule-title">Дождь и мокрая дорога</div><div class="rule-sub">Снижение на 10–20 км/ч от нормы</div></div>
+          <span class="rule-chevron">›</span>
+        </div>
+        <div class="rule-body">
+          <p>При дожде увеличивается тормозной путь. Снижайте скорость так, чтобы тормозной путь не превышал видимость.</p>
+          <div class="highlight">💡 Правило: дистанция = половина скорости. При 60 км/ч — не менее 30 м до впереди идущего авто</div>
+        </div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-head" onclick="toggleRule(this)">
+          <div class="rule-icon-wrap" style="background:#E8F5E9">❄️</div>
+          <div><div class="rule-title">Гололёд и снег</div><div class="rule-sub">Тормозной путь увеличивается в 3–5 раз</div></div>
+          <span class="rule-chevron">›</span>
+        </div>
+        <div class="rule-body">
+          <p>На обледенелой дороге тормозной путь при 60 км/ч может составлять более 150 м. Рекомендуется снижать скорость вдвое.</p>
+          <div class="highlight">💡 На скользкой дороге резкое торможение приводит к заносу. Тормозите плавно!</div>
+        </div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-head" onclick="toggleRule(this)">
+          <div class="rule-icon-wrap" style="background:#FFF3E0">🌫️</div>
+          <div><div class="rule-title">Туман и ограниченная видимость</div><div class="rule-sub">Скорость по дистанции видимости</div></div>
+          <span class="rule-chevron">›</span>
+        </div>
+        <div class="rule-body">
+          <p>При видимости менее 300 м включаются противотуманные фары. Скорость не должна превышать дистанцию видимости (м) в км/ч.</p>
+          <div class="highlight">💡 Видимость 50 м — скорость не более 50 км/ч</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- TAB 4: КВИЗ -->
+<!-- ══════════════════════════════════════════ -->
+<div id="panel-quiz" class="tab-panel signs-section">
+  <div class="quiz-wrap" id="quizArea"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="signModal" onclick="closeModal(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="document.getElementById('signModal').classList.remove('open')">✕</button>
+    <div class="modal-sign-big" id="modalSvg"></div>
+    <div class="modal-num" id="modalNum"></div>
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-desc" id="modalDesc"></div>
+    <div class="modal-where" id="modalWhere"></div>
+    <div class="modal-fine" id="modalFine" style="display:none"></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="js/app.js"></script>
+<script>
+initNav();
+
+/* ══════════════════════════════
+   ДАННЫЕ: ЗНАКИ
+══════════════════════════════ */
+const SIGNS = [
+  // ЗАПРЕЩАЮЩИЕ
+  { id:'3.1',  cat:'prohibit', name:'Въезд запрещён', short:'«Кирпич»',
+    desc:'Запрещает въезд всем транспортным средствам в данном направлении. Устанавливается на дорогах с односторонним движением.',
+    where:['На въездах на дороги с односторонним движением','У въездов на территории, закрытые для въезда'],
+    fine:'Штраф: 1000–2000 сом',
+    svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="40" r="36" fill="#C62828" stroke="#fff" stroke-width="3"/>
+      <rect x="16" y="33" width="48" height="14" rx="3" fill="#fff"/>
+    </svg>` },
+
+  { id:'3.2',  cat:'prohibit', name:'Движение запрещено', short:'Для всех ТС',
+    desc:'Запрещает движение всех транспортных средств в обоих направлениях.',
+    where:['На перекрёстках','На участках дорог при проведении работ'],
+    fine:'Штраф: 500–1000 сом',
+    svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="40" r="36" fill="#fff" stroke="#C62828" stroke-width="5"/>
+      <line x1="22" y1="22" x2="58" y2="58" stroke="#C62828" stroke-width="8" stroke-linecap="round"/>
+    </svg>` },
+
+  { id:'3.20', cat:'prohibit', name:'Обгон запрещён', short:'Только для легковых',
+    desc:'Запрещает обгон всех транспортных средств, кроме тихоходных и велосипедов.',
+    where:['На опасных участках дорог','На подъёмах, перекрёстках, пешеходных переходах'],
+    fine:'Штраф: 2000–5000 сом + лишение прав',
+    svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="40" r="36" fill="#fff" stroke="#C62828" stroke-width="5"/>
+      <text x="40" y="30" font-size="11" text-anchor="middle" fill="#333" font-family="sans-serif" font-weight="bold">🚗</text>
+      <text x="28" y="50" font-size="10" text-anchor="middle" fill="#555" font-family="sans-serif">←</text>
+      <text x="52" y="50" font-size="10" text-anchor="middle" fill="#C62828" font-family="sans-serif">🚗</text>
+      <line x1="20" y1="20" x2="60" y2="60" stroke="#C62828" stroke-width="6" stroke-linecap="round"/>
+    </svg>` },
+
+  { id:'3.24', cat:'prohibit', name:'Ограничение скорости', short:'60 км/ч (пример)',
+    desc:'Запрещает движение со скоростью, превышающей указанную на знаке (в км/ч).',
+    where:['На участках дорог с ограничениями','Вблизи школ, больниц, жилых зон'],
+    fine:'Штраф зависит от превышения: 500–5000+ сом',
+    svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="40" r="36" fill="#fff" stroke="#C62828" stroke-width="5"/>
+      <text x="40" y="47" font-size="22" text-anchor="middle" fill="#1A2332" font-family="sans-serif" font-weight="bold">60</text>
+    </svg>` },
+
+  { id:'3.27', cat:'prohibit', name:'Остановка запрещена', short:'Нельзя останавливаться',
+    desc:'Запрещает остановку и стоянку транспортных средств на данном участке дороги.',
+    where:['На остановках общественного транспорта','На мостах, в тоннелях','На перекрёстках'],
+    fine:'Штраф: 1000–2000 сом + возможная эвакуация',
+    svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="40" r="36" fill="#fff" stroke="#C62828" stroke-width="5"/>
+      <line x1="40" y1="18" x2="40" y2="62" stroke="#C62828" stroke-width="7" stroke-linecap="round"/>
+      <line x1="22" y1="22" x2="58" y2="58" stroke="#C62828" stroke-width="5" stroke-linecap="round"/>
+    </svg>` },
+
+  { id:'3.28', cat:'prohibit', name:'Стоянка запрещена', short:'Остановиться можно',
+    desc:'Запрещает стоянку (более 5 минут) транспортных средств. Кратковременная остановка разрешена.',
+    where:['Вдоль проезжей части в определённых местах','Рядом с объектами инфраструктуры'],
+    fine:'Штраф: 500–1000 сом',
+    svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="40" r="36" fill="#fff" stroke="#C62828" stroke-width="5"/>
+      <line x1="40" y1="18" x2="40" y2="62" stroke="#C62828" stroke-width="7" stroke-linecap="round"/>
+      <line x1="22" y1="22" x2="58" y2="22" stroke="#C62828" stroke-width="5" stroke-linecap="round"/>
+    </svg>` },
+
+  // ПРЕДУПРЕЖДАЮЩИЕ
+  { id:'1.1',  cat:'warning', name:'Опасный поворот', short:'Вправо',
+    desc:'Предупреждает о приближении к опасному повороту с малым радиусом кривизны.',
+    where:['Устанавливается за 50–100 м до поворота вне нас. пунктов','За 25–50 м в населённых пунктах'],
+    svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="40,8 74,68 6,68" fill="#fff" stroke="#E65100" stroke-width="4"/>
+      <path d="M34 52 Q34 32 50 32 Q50 44 42 44" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round"/>
+      <line x1="42" y1="44" x2="42" y2="56" stroke="#333" stroke-width="4" stroke-linecap="round"/>
+    </svg>` },
+
+  { id:'1.11', cat:'warning', name:'Пешеходный переход', short:'Впереди зебра',
+    desc:'Предупреждает о приближении к нерегулируемому пешеходному переходу.',
+    where:['За 50–100 м до перехода','Устанавливается в паре с дублирующим знаком'],
+    svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="40,8 74,68 6,68" fill="#fff" stroke="#E65100" stroke-width="4"/>
+      <text x="40" y="58" font-size="28" text-anchor="middle">🚶</text>
+    </svg>` },
+
+  { id:'1.17', cat:'warning', name:'Дети', short:'Вблизи школы',
+    desc:'Предупреждает о возможном появлении детей на дороге вблизи школ, детских учреждений.',
+    where:['Перед детскими учреждениями','У школ и детских площадок'],
+    svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="40,8 74,68 6,68" fill="#fff" stroke="#E65100" stroke-width="4"/>
+      <text x="40" y="58" font-size="26" text-anchor="middle">👧</text>
+    </svg>` },
+
+  { id:'1.22', cat:'warning', name:'Железнодорожный переезд', short:'Со шлагбаумом',
+    desc:'Предупреждает о приближении к железнодорожному переезду, оборудованному шлагбаумом.',
+    where:['За 150–300 м до переезда','Устанавливается комплектом из трёх знаков'],
+    svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="40,8 74,68 6,68" fill="#fff" stroke="#E65100" stroke-width="4"/>
+      <line x1="40" y1="24" x2="40" y2="60" stroke="#E65100" stroke-width="5"/>
+      <line x1="26" y1="36" x2="54" y2="36" stroke="#E65100" stroke-width="5"/>
+    </svg>` },
+
+  { id:'1.25', cat:'warning', name:'Дорожные работы', short:'Осторожно',
+    desc:'Предупреждает о проведении дорожных работ на данном участке или рядом с проезжей частью.',
+    where:['На участках с ремонтными работами','Действует на протяжении всей зоны работ'],
+    svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="40,8 74,68 6,68" fill="#fff" stroke="#E65100" stroke-width="4"/>
+      <text x="40" y="60" font-size="30" text-anchor="middle">⚒️</text>
+    </svg>` },
+
+  // ПРЕДПИСЫВАЮЩИЕ
+  { id:'4.1.1', cat:'mandatory', name:'Движение прямо', short:'Только вперёд',
+    desc:'Разрешает движение только в прямом направлении.',
+    where:['На перекрёстках, где запрещён поворот','На участках с разделительной полосой'],
+    svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="40" r="36" fill="#1565C0"/>
+      <polygon points="40,18 52,42 44,42 44,58 36,58 36,42 28,42" fill="#fff"/>
+    </svg>` },
+
+  { id:'4.1.2', cat:'mandatory', name:'Движение направо', short:'Обязательный поворот',
+    desc:'Разрешает движение только направо. Устанавливается перед перекрёстком.',
+    where:['Перед перекрёстками с обязательным поворотом','На разворотных площадках'],
+    svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="40" r="36" fill="#1565C0"/>
+      <path d="M26 54 L26 36 Q26 26 36 26 L50 26 L44 20 M44 32 L50 26" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>` },
+
+  { id:'4.3',  cat:'mandatory', name:'Круговое движение', short:'Уступи въезжающим',
+    desc:'Указывает направление движения на перекрёстке с круговым движением.',
+    where:['На всех въездах на кольцо','В паре со знаком 2.4 «Уступи дорогу»'],
+    svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="40" r="36" fill="#1565C0"/>
+      <path d="M40 20 A20 20 0 1 1 20 40" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+      <polygon points="20,40 14,32 28,32" fill="#fff"/>
+    </svg>` },
+
+  { id:'4.7',  cat:'mandatory', name:'Пешеходная дорожка', short:'Только пешеходы',
+    desc:'Обозначает дорожку, предназначенную для движения пешеходов.',
+    where:['На тротуарах и пешеходных дорожках','В парках и жилых зонах'],
+    svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="40" r="36" fill="#1565C0"/>
+      <text x="40" y="52" font-size="30" text-anchor="middle">🚶</text>
+    </svg>` },
+
+  // ИНФОРМАЦИОННЫЕ
+  { id:'5.1',  cat:'info', name:'Автомагистраль', short:'Спец. правила',
+    desc:'Обозначает дорогу, на которой действуют особые правила: скорость до 110 км/ч, запрет для тихоходных ТС.',
+    where:['На въезде на автомагистраль','Действует до знака 5.2 (конец автомагистрали)'],
+    svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="4" width="72" height="72" rx="8" fill="#1565C0"/>
+      <text x="40" y="30" font-size="11" text-anchor="middle" fill="#fff" font-family="sans-serif" font-weight="bold">АВТО</text>
+      <text x="40" y="50" font-size="11" text-anchor="middle" fill="#fff" font-family="sans-serif" font-weight="bold">МАГИСТРАЛЬ</text>
+    </svg>` },
+
+  { id:'5.15.1', cat:'info', name:'Направление по полосам', short:'Указывает движение',
+    desc:'Указывает направление движения по каждой полосе проезжей части.',
+    where:['Над каждой полосой движения','На сложных перекрёстках'],
+    svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="4" width="72" height="72" rx="8" fill="#1565C0"/>
+      <polygon points="25,50 25,28 19,28 32,14 45,28 39,28 39,50" fill="#fff"/>
+      <polygon points="55,42 55,28 49,28 62,14 75,28 69,28 69,50 49,50 49,42" fill="#fff"/>
+    </svg>` },
+
+  { id:'6.4',  cat:'info', name:'Место стоянки', short:'Парковка',
+    desc:'Обозначает место, где разрешена стоянка транспортных средств.',
+    where:['На оборудованных парковках','В специально отведённых местах'],
+    svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <rect x="4" y="4" width="72" height="72" rx="8" fill="#1565C0"/>
+      <text x="40" y="55" font-size="46" text-anchor="middle" fill="#fff" font-family="sans-serif" font-weight="bold">P</text>
+    </svg>` },
+
+  // ПРИОРИТЕТ
+  { id:'2.1',  cat:'priority', name:'Главная дорога', short:'Вы на главной',
+    desc:'Водитель, движущийся по главной дороге, имеет преимущество на перекрёстке.',
+    where:['На главных дорогах','На въезде в населённые пункты'],
+    svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <rect x="18" y="18" width="44" height="44" rx="3" fill="#F9A825" stroke="#E65100" stroke-width="3" transform="rotate(45 40 40)"/>
+    </svg>` },
+
+  { id:'2.4',  cat:'priority', name:'Уступи дорогу', short:'Помеха справа',
+    desc:'Водитель обязан уступить дорогу транспортным средствам, движущимся по пересекаемой дороге.',
+    where:['На второстепенных дорогах перед перекрёстком','На въездах на главную дорогу'],
+    fine:'Штраф: 500–2000 сом',
+    svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="40,72 6,12 74,12" fill="#fff" stroke="#C62828" stroke-width="5"/>
+      <polygon points="40,62 14,20 66,20" fill="#C62828"/>
+    </svg>` },
+
+  { id:'2.5',  cat:'priority', name:'Движение без остановки запрещено', short:'СТОП',
+    desc:'Водитель обязан остановиться перед стоп-линией и убедиться в безопасности.',
+    where:['На опасных перекрёстках','На пересечениях с ж/д переездами'],
+    fine:'Штраф: 1000–3000 сом',
+    svg:`<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="40,72 6,12 74,12" fill="#fff" stroke="#C62828" stroke-width="5"/>
+      <polygon points="40,62 14,20 66,20" fill="#C62828"/>
+      <text x="40" y="26" font-size="11" text-anchor="middle" fill="#fff" font-family="sans-serif" font-weight="900">СТОП</text>
+    </svg>` },
+];
+
+/* ══════════════════════════════
+   ДАННЫЕ: ПРАВИЛА
+══════════════════════════════ */
+const RULES = [
+  { icon:'🚦', color:'#E3F2FD', title:'Сигналы светофора', sub:'Значение каждого сигнала',
+    content:`<p>Светофор регулирует движение на перекрёстках и пешеходных переходах.</p>
+    <ul>
+      <li><strong>🟢 Зелёный</strong> — движение разрешено</li>
+      <li><strong>🟢 Мигающий зелёный</strong> — сигнал скоро сменится, заканчивайте проезд</li>
+      <li><strong>🟡 Жёлтый</strong> — движение запрещено (кроме случаев, когда остановка опасна)</li>
+      <li><strong>🟡 Мигающий жёлтый</strong> — нерегулируемый перекрёсток, будьте осторожны</li>
+      <li><strong>🔴 Красный</strong> — движение запрещено</li>
+    </ul>
+    <div class="highlight">💡 При мигающем жёлтом — действуют правила нерегулируемого перекрёстка (помеха справа)</div>` },
+
+  { icon:'🔄', color:'#E8F5E9', title:'Правила проезда перекрёстков', sub:'Очерёдность и приоритет',
+    content:`<p>На регулируемых перекрёстках — подчиняться сигналам светофора или регулировщика.</p>
+    <p>На нерегулируемых перекрёстках:</p>
+    <ul>
+      <li>На равнозначных дорогах — <strong>уступить помехе справа</strong></li>
+      <li>На главной дороге — имеете преимущество</li>
+      <li>При повороте налево — уступить встречным ТС</li>
+      <li>На кольце — уступить тем, кто уже на кольце</li>
+    </ul>
+    <div class="highlight">💡 «Помеха справа» — тот, кто едет справа от вас, имеет преимущество</div>` },
+
+  { icon:'🚶', color:'#FFF3E0', title:'Пешеходы и пешеходный переход', sub:'Права и обязанности',
+    content:`<p>На нерегулируемом пешеходном переходе:</p>
+    <ul>
+      <li>Водитель <strong>обязан уступить дорогу</strong> пешеходу, вступившему на переход</li>
+      <li>Запрещено обгонять и объезжать остановившиеся ТС перед переходом</li>
+      <li>При наличии разделительной полосы — убедиться, что пешеход дошёл до вашей половины</li>
+    </ul>
+    <div class="highlight">💡 За непропуск пешехода — штраф 1000–2000 сом и 3 штрафных балла</div>` },
+
+  { icon:'🚗', color:'#F3E5F5', title:'Обгон и опережение', sub:'Когда разрешён, когда нет',
+    content:`<p>Обгон разрешён только при соблюдении всех условий одновременно:</p>
+    <ul>
+      <li>Нет сплошной линии разметки</li>
+      <li>Встречная полоса свободна на достаточном расстоянии</li>
+      <li>Нет знака «Обгон запрещён» (3.20)</li>
+      <li>Вы успеете вернуться до появления встречных ТС</li>
+    </ul>
+    <p>Обгон <strong>запрещён</strong>:</p>
+    <ul>
+      <li>На регулируемых перекрёстках</li>
+      <li>На пешеходных переходах</li>
+      <li>На подъёмах с ограниченной видимостью</li>
+      <li>В тоннелях и на мостах</li>
+    </ul>
+    <div class="highlight">💡 Обгон справа — опережение, а не обгон. Разрешено в пробке при движении по своей полосе</div>` },
+
+  { icon:'🅿️', color:'#FAFAFA', title:'Остановка и стоянка', sub:'Где нельзя',
+    content:`<p>Остановка запрещена:</p>
+    <ul>
+      <li>На трамвайных путях и ближе 5 м от них</li>
+      <li>На пешеходных переходах и ближе 5 м перед ними</li>
+      <li>На перекрёстках и ближе 5 м от края пересекаемой проезжей части</li>
+      <li>В тоннелях, на мостах и эстакадах</li>
+      <li>Если создаётся помеха движению</li>
+    </ul>
+    <p>Стоянка запрещена дополнительно:</p>
+    <ul>
+      <li>В местах, где авто закроет знаки или светофоры</li>
+      <li>На расстоянии менее 15 м от остановки общественного транспорта</li>
+    </ul>
+    <div class="highlight">💡 Остановка — до 5 минут. Стоянка — более 5 минут или водитель покидает авто</div>` },
+
+  { icon:'💡', color:'#FFFDE7', title:'Применение световых приборов', sub:'Когда что включать',
+    content:`<ul>
+      <li><strong>Ближний свет</strong> — в тёмное время суток и при плохой видимости</li>
+      <li><strong>Дальний свет</strong> — вне населённых пунктов при отсутствии встречных ТС</li>
+      <li><strong>Переключение на ближний</strong> — за 150 м до встречного ТС (или раньше при ослеплении)</li>
+      <li><strong>Аварийная сигнализация</strong> — при ДТП, буксировке, остановке на опасном участке</li>
+      <li><strong>Противотуманные фары</strong> — при видимости менее 300 м</li>
+    </ul>
+    <div class="highlight">💡 Езда без включённых фар в тёмное время — штраф 500 сом</div>` },
+
+  { icon:'🍺', color:'#FFEBEE', title:'Алкоголь и вождение', sub:'Нулевая терпимость',
+    content:`<p>В Кыргызской Республике допустимый уровень алкоголя — <strong>0.0 промилле</strong>. Управление ТС в нетрезвом виде строго запрещено.</p>
+    <ul>
+      <li>Первичное нарушение: штраф 10 000–20 000 сом + лишение прав на 1–2 года</li>
+      <li>Повторное нарушение: лишение прав на 3 года + возможное лишение свободы</li>
+      <li>ДТП в нетрезвом состоянии — уголовная ответственность</li>
+    </ul>
+    <div class="highlight">⚠️ Даже небольшое количество алкоголя замедляет реакцию в 2–3 раза!</div>` },
+
+  { icon:'📱', color:'#E8EAF6', title:'Мобильный телефон за рулём', sub:'Штрафы и правила',
+    content:`<p>Использование телефона во время движения <strong>запрещено</strong>, кроме случаев использования гарнитуры «hands-free».</p>
+    <ul>
+      <li>Разговор по телефону без гарнитуры — штраф 500–1000 сом</li>
+      <li>Переписка (SMS, мессенджеры) — аналогичный штраф</li>
+      <li>Просмотр навигатора — разрешён, если телефон закреплён на держателе</li>
+    </ul>
+    <div class="highlight">💡 Набор сообщения отвлекает внимание на 5 секунд — при 90 км/ч это 125 метров вслепую</div>` },
+];
+
+/* ══════════════════════════════
+   КВИЗ
+══════════════════════════════ */
+const QUIZ_QUESTIONS = [
+  { q:'Что означает красный круг с белой горизонтальной полосой?', opts:['Движение запрещено','Въезд запрещён («кирпич»)','Остановка запрещена','Обгон запрещён'], a:1, explain:'Знак 3.1 «Въезд запрещён» («кирпич») — запрещает въезд в данном направлении.' },
+  { q:'Перевёрнутый красный треугольник означает:', opts:['Конец главной дороги','Уступи дорогу','Остановка обязательна','Движение запрещено'], a:1, explain:'Знак 2.4 «Уступите дорогу» — обязывает пропустить ТС на пересекаемой дороге.' },
+  { q:'Жёлтый ромб на дороге означает:', opts:['Опасный поворот','Главная дорога','Дорожные работы','Конец всех ограничений'], a:1, explain:'Знак 2.1 «Главная дорога» — вы имеете преимущество на перекрёстке.' },
+  { q:'Синий круг со стрелкой вверх означает:', opts:['Обгон разрешён','Движение прямо обязательно','Главная дорога','Рекомендуемая скорость'], a:1, explain:'Знак 4.1.1 «Движение прямо» — предписывает ехать только вперёд.' },
+  { q:'Знак с буквой «P» на синем фоне означает:', opts:['Парковка разрешена','Ремонт дороги','Проезд платный','Скорость ограничена'], a:0, explain:'Знак 6.4 «Место стоянки» — здесь разрешена парковка.' },
+  { q:'На каком расстоянии до пешеходного перехода запрещена остановка?', opts:['3 метра','5 метров','10 метров','15 метров'], a:1, explain:'ПДД запрещает остановку менее чем за 5 метров до пешеходного перехода.' },
+  { q:'Что означает мигающий жёлтый сигнал светофора?', opts:['Можно ехать медленно','Нерегулируемый перекрёсток','Скоро будет красный','Движение запрещено'], a:1, explain:'Мигающий жёлтый сигнализирует о нерегулируемом перекрёстке — действуют правила очерёдности.' },
+  { q:'Предупреждающие знаки имеют форму:', opts:['Круга','Прямоугольника','Треугольника','Ромба'], a:2, explain:'Предупреждающие знаки (1.x) — белый треугольник с красной каймой.' },
+];
+
+/* ══════════════════════════════
+   СОСТОЯНИЕ
+══════════════════════════════ */
+const learned = new Set(JSON.parse(localStorage.getItem('learnedSigns') || '[]'));
+let quizIdx = 0, quizScore = 0, quizAnswered = false;
+
+/* ══════════════════════════════
+   РЕНДЕР ЗНАКОВ
+══════════════════════════════ */
+function renderSigns(list, containerId) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = list.map(s => `
+    <div class="sign-card ${learned.has(s.id) ? 'active' : ''}" 
+         id="sc-${s.id}" onclick="openSign('${s.id}')">
+      <div class="sign-svg-wrap">${s.svg}</div>
+      <div class="sign-number">${s.id}</div>
+      <div class="sign-name">${s.name}</div>
+      <div class="sign-short">${s.short}</div>
+      ${learned.has(s.id) ? '<div style="color:#2E7D32;font-size:11px;margin-top:6px;font-weight:700">✓ Изучен</div>' : ''}
+    </div>`).join('');
+}
+
+function renderAllSigns() {
+  const cats = { prohibit:'grid-prohibit', warning:'grid-warning', mandatory:'grid-mandatory', info:'grid-info', priority:'grid-priority' };
+  Object.entries(cats).forEach(([cat, gridId]) => {
+    renderSigns(SIGNS.filter(s => s.cat === cat), gridId);
+  });
+  updateProgress();
+}
+
+/* ══════════════════════════════
+   МОДАЛЬНОЕ ОКНО
+══════════════════════════════ */
+function openSign(id) {
+  const s = SIGNS.find(x => x.id === id);
+  if (!s) return;
+  document.getElementById('modalSvg').innerHTML = s.svg;
+  document.getElementById('modalNum').textContent = 'Знак ' + s.id;
+  document.getElementById('modalTitle').textContent = s.name;
+  document.getElementById('modalDesc').textContent = s.desc;
+  const wh = document.getElementById('modalWhere');
+  wh.innerHTML = s.where ? `<h4>📍 Где устанавливается:</h4><ul>${s.where.map(w=>`<li>${w}</li>`).join('')}</ul>` : '';
+  const fin = document.getElementById('modalFine');
+  if (s.fine) { fin.innerHTML = `<strong>⚠️ Нарушение:</strong><span>${s.fine}</span>`; fin.style.display='block'; }
+  else fin.style.display='none';
+  document.getElementById('signModal').classList.add('open');
+
+  // Mark as learned
+  if (!learned.has(id)) {
+    learned.add(id);
+    localStorage.setItem('learnedSigns', JSON.stringify([...learned]));
+    renderAllSigns();
+    showToast('✅ Знак изучен!', 'success');
+  }
+}
+
+function closeModal(e) {
+  if (e.target.id === 'signModal') document.getElementById('signModal').classList.remove('open');
+}
+
+/* ══════════════════════════════
+   ПРОГРЕСС
+══════════════════════════════ */
+function updateProgress() {
+  const pct = Math.round(learned.size / SIGNS.length * 100);
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('progLabel').textContent = `Изучено: ${learned.size} из ${SIGNS.length} знаков`;
+}
+
+/* ══════════════════════════════
+   ПРАВИЛА
+══════════════════════════════ */
+function renderRules() {
+  const el = document.getElementById('rulesList');
+  el.innerHTML = RULES.map((r, i) => `
+    <div class="rule-card">
+      <div class="rule-head" onclick="toggleRule(this)">
+        <div class="rule-icon-wrap" style="background:${r.color}">${r.icon}</div>
+        <div>
+          <div class="rule-title">${r.title}</div>
+          <div class="rule-sub">${r.sub}</div>
+        </div>
+        <span class="rule-chevron">›</span>
+      </div>
+      <div class="rule-body">${r.content}</div>
+    </div>`).join('');
+}
+
+function toggleRule(head) {
+  const body = head.nextElementSibling;
+  const chev = head.querySelector('.rule-chevron');
+  const open = body.classList.contains('open');
+  body.classList.toggle('open', !open);
+  chev.classList.toggle('open', !open);
+}
+
+/* ══════════════════════════════
+   ПОИСК
+══════════════════════════════ */
+function doSearch(q) {
+  q = q.trim().toLowerCase();
+  if (!q) { renderAllSigns(); document.getElementById('noResults').style.display='none'; return; }
+
+  const cats = { prohibit:'grid-prohibit', warning:'grid-warning', mandatory:'grid-mandatory', info:'grid-info', priority:'grid-priority' };
+  let total = 0;
+  Object.entries(cats).forEach(([cat, gridId]) => {
+    const filtered = SIGNS.filter(s => s.cat === cat && (
+      s.name.toLowerCase().includes(q) ||
+      s.id.toLowerCase().includes(q) ||
+      s.short.toLowerCase().includes(q) ||
+      s.desc.toLowerCase().includes(q)
+    ));
+    renderSigns(filtered, gridId);
+    total += filtered.length;
+  });
+  document.getElementById('noResults').style.display = total === 0 ? 'block' : 'none';
+}
+
+/* ══════════════════════════════
+   ТАБЫ
+══════════════════════════════ */
+function showTab(name) {
+  ['signs','rules','speed','quiz'].forEach(t => {
+    document.getElementById('panel-'+t).classList.toggle('active', t===name);
+    document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle('active', t===name);
+  });
+  if (name === 'quiz') renderQuiz();
+}
+
+/* ══════════════════════════════
+   КВИЗ
+══════════════════════════════ */
+function renderQuiz() {
+  if (quizIdx >= QUIZ_QUESTIONS.length) {
+    document.getElementById('quizArea').innerHTML = `
+      <div style="text-align:center;padding:40px 0">
+        <div style="font-size:60px;margin-bottom:16px">${quizScore >= QUIZ_QUESTIONS.length*0.75 ? '🎉' : '📚'}</div>
+        <h2 style="font-size:26px;font-weight:800;margin-bottom:8px">Результат: ${quizScore} / ${QUIZ_QUESTIONS.length}</h2>
+        <p style="color:var(--text-secondary);margin-bottom:24px">${quizScore >= QUIZ_QUESTIONS.length*0.75 ? 'Отлично! Знаки знаете хорошо!' : 'Повторите знаки и попробуйте ещё раз!'}</p>
+        <button class="btn btn-primary" onclick="quizIdx=0;quizScore=0;renderQuiz()">🔄 Пройти снова</button>
+      </div>`;
+    return;
+  }
+  const q = QUIZ_QUESTIONS[quizIdx];
+  const letters = ['А','Б','В','Г'];
+  document.getElementById('quizArea').innerHTML = `
+    <div style="margin-bottom:12px;font-size:13px;color:var(--text-secondary)">
+      Вопрос ${quizIdx+1} из ${QUIZ_QUESTIONS.length} 
+      <span class="quiz-score">✅ ${quizScore}</span>
+    </div>
+    <div class="quiz-q">${q.q}</div>
+    <div class="quiz-opts">
+      ${q.opts.map((o,i) => `
+        <div class="quiz-opt" id="qo${i}" onclick="selectQuizOpt(${i})">
+          <div class="quiz-letter">${letters[i]}</div>${o}
+        </div>`).join('')}
+    </div>
+    <div class="quiz-feedback" id="quizFeedback"></div>
+    <div class="quiz-nav">
+      <span class="quiz-progress-text">${quizIdx+1} / ${QUIZ_QUESTIONS.length}</span>
+      <button class="btn btn-primary" id="qNextBtn" onclick="quizIdx++;renderQuiz()" style="display:none">Следующий →</button>
+    </div>`;
+}
+
+function selectQuizOpt(i) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const q = QUIZ_QUESTIONS[quizIdx];
+  const correct = q.a === i;
+  if (correct) quizScore++;
+  document.querySelectorAll('.quiz-opt').forEach((el,idx) => {
+    el.classList.add('disabled');
+    if (idx === q.a) el.classList.add('correct');
+    else if (idx === i && !correct) el.classList.add('wrong');
+  });
+  const fb = document.getElementById('quizFeedback');
+  fb.textContent = (correct ? '✅ Верно! ' : '❌ Неверно. ') + q.explain;
+  fb.className = 'quiz-feedback show ' + (correct ? 'ok' : 'err');
+  document.getElementById('qNextBtn').style.display = 'inline-flex';
+  quizAnswered = false;
+}
+
+/* ══════════════════════════════
+   INIT
+══════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  renderAllSigns();
+  renderRules();
+});
+</script>
+</body>
+</html>

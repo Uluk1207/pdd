@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ПДД Онлайн — Подготовка к экзамену ПДД</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.hero { padding: 70px 24px 60px; }
+.feature-section { background: #fff; padding: 48px 24px; }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="nav-logo">
+    <div class="logo-icon">🚗</div>
+    ПДД Онлайн
+  </a>
+  <ul class="nav-menu" id="navMenu">
+    <li><a href="index.html" class="active">Главная</a></li>
+    <li><a href="learn.html">Учебник ПДД</a></li>
+    <li><a href="tickets.html">Билеты</a></li>
+    <li><a href="exam.html">Экзамен</a></li>
+    <li><a href="mistakes.html">Мои ошибки</a></li>
+    <li><a href="stats.html">Статистика</a></li>
+    <li><a href="rating.html">Рейтинг</a></li>
+    <li><a href="profile.html">Кабинет</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="nav-search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Поиск вопросов..." id="searchInput">
+    </div>
+    <div id="navAuth">
+      <a href="login.html" class="btn btn-white btn-sm">Войти</a>
+    </div>
+  </div>
+  <button class="hamburger" onclick="toggleMenu()" id="hamburger">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">🏠 Главная</a>
+  <a href="tickets.html">📋 Билеты</a>
+  <a href="topics.html">📚 Темы</a>
+  <a href="exam.html">📝 Экзамен</a>
+  <a href="marathon.html">🏃 Марафон</a>
+  <a href="mistakes.html">❌ Мои ошибки</a>
+  <a href="stats.html">📊 Статистика</a>
+  <a href="rating.html">🏆 Рейтинг</a>
+  <a href="profile.html">👤 Кабинет</a>
+  <a href="login.html">🔑 Войти</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <h1>🚦 Подготовка к экзамену ПДД</h1>
+    <p>Изучайте правила дорожного движения, проходите тесты и готовьтесь к экзамену в ГИБДД. Более 700 вопросов в 35 билетах.</p>
+    <div class="hero-actions">
+      <a href="exam.html" class="btn btn-accent btn-lg">📝 Начать экзамен</a>
+      <a href="tickets.html" class="btn btn-white btn-lg">📋 Все билеты</a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-num">35</div><div class="stat-lbl">Билетов</div></div>
+  <div class="stat-item"><div class="stat-num">700+</div><div class="stat-lbl">Вопросов</div></div>
+  <div class="stat-item"><div class="stat-num">25 мин</div><div class="stat-lbl">На экзамен</div></div>
+  <div class="stat-item"><div class="stat-num" id="usersCount">0</div><div class="stat-lbl">Пользователей</div></div>
+</div>
+
+<!-- РЕЖИМЫ -->
+<section class="section container">
+  <div class="section-title">🎮 Выберите <span>режим</span></div>
+  <div class="mode-cards">
+    <div class="mode-card" onclick="go('tickets.html')">
+      <div class="mode-icon">📋</div>
+      <h3>Билеты</h3>
+      <p>35 билетов по 20 вопросов</p>
+    </div>
+    <div class="mode-card" onclick="go('topics.html')">
+      <div class="mode-icon">📚</div>
+      <h3>Темы</h3>
+      <p>Вопросы по темам ПДД</p>
+    </div>
+    <div class="mode-card" onclick="go('exam.html')">
+      <div class="mode-icon">📝</div>
+      <h3>Экзамен</h3>
+      <p>20 вопросов, 25 минут</p>
+    </div>
+    <div class="mode-card" onclick="go('marathon.html')">
+      <div class="mode-icon">🏃</div>
+      <h3>Марафон</h3>
+      <p>Все вопросы подряд</p>
+    </div>
+    <div class="mode-card" onclick="go('mistakes.html')">
+      <div class="mode-icon">❌</div>
+      <h3>Мои ошибки</h3>
+      <p>Работа над ошибками</p>
+    </div>
+  </div>
+</section>
+
+<!-- ПОСЛЕДНИЕ ТЕСТЫ (авторизованным) -->
+<section class="section container" id="recentSection" style="display:none">
+  <div class="section-title">📊 Последние <span>результаты</span></div>
+  <div id="recentResults"></div>
+</section>
+
+<!-- ТЕМЫ -->
+<section class="feature-section">
+  <div class="container">
+    <div class="section-title">📚 Основные <span>темы ПДД</span></div>
+    <div class="topics-list" id="topicsList"></div>
+  </div>
+</section>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/app.js"></script>
+<script>
+const TOPICS = [
+  { icon: '⚠️', name: 'Общие положения', sub: 'Термины и определения ПДД' },
+  { icon: '🚦', name: 'Дорожные знаки', sub: 'Запрещающие, предупреждающие, информационные' },
+  { icon: '🚗', name: 'Обгон и опережение', sub: 'Правила обгона на дороге' },
+  { icon: '🅿️', name: 'Остановка и стоянка', sub: 'Где и как можно парковаться' },
+  { icon: '🛑', name: 'Приоритет и проезд', sub: 'Право преимущественного проезда' },
+  { icon: '💡', name: 'Световые приборы', sub: 'Применение фар и сигналов' },
+  { icon: '🔄', name: 'Перекрёстки', sub: 'Правила проезда перекрёстков' },
+  { icon: '👟', name: 'Пешеходы и велосипеды', sub: 'Права и обязанности пешеходов' },
+];
+
+document.addEventListener('DOMContentLoaded', () => {
+  initNav();
+  loadTopics();
+  loadStats();
+  loadRecent();
+});
+
+function loadTopics() {
+  const el = document.getElementById('topicsList');
+  TOPICS.forEach((t, i) => {
+    el.innerHTML += `
+      <div class="topic-item" onclick="go('topics.html?id=${i+1}')">
+        <div class="topic-icon">${t.icon}</div>
+        <div class="topic-info">
+          <h4>${t.name}</h4>
+          <div class="t-sub">${t.sub}</div>
+        </div>
+        <div class="topic-arrow">›</div>
+      </div>`;
+  });
+}
+
+async function loadStats() {
+  try {
+    const r = await api('/stats/public');
+    if (r.users) document.getElementById('usersCount').textContent = r.users;
+  } catch {}
+}
+
+async function loadRecent() {
+  const token = localStorage.getItem('token');
+  if (!token) return;
+  document.getElementById('recentSection').style.display = 'block';
+  try {
+    const results = await api('/results/my?limit=3');
+    const el = document.getElementById('recentResults');
+    if (!results.length) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><h3>Нет результатов</h3><p>Пройдите первый тест!</p></div>';
+      return;
+    }
+    el.innerHTML = '<div class="stats-grid">' + results.map(r => `
+      <div class="stat-card blue">
+        <div class="s-num">${r.score}%</div>
+        <div class="s-lbl">${r.title || 'Тест'} — ${new Date(r.date).toLocaleDateString('ru')}</div>
+        <div style="margin-top:10px"><span class="badge badge-success">✓ ${r.correct}</span> <span class="badge badge-danger">✗ ${r.wrong}</span></div>
+      </div>`).join('') + '</div>';
+  } catch {}
+}
+
+function go(url) { window.location.href = url; }
+</script>
+</body>
+</html>

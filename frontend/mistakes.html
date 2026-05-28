@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Мои ошибки — ПДД Онлайн</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="nav-logo"><div class="logo-icon">🚗</div>ПДД Онлайн</a>
+  <ul class="nav-menu">
+    <li><a href="index.html">Главная</a></li>
+    <li><a href="tickets.html">Билеты</a></li>
+    <li><a href="exam.html">Экзамен</a></li>
+    <li><a href="mistakes.html" class="active">Ошибки</a></li>
+    <li><a href="rating.html">Рейтинг</a></li>
+    <li><a href="profile.html">Кабинет</a></li>
+  </ul>
+  <div class="nav-right" id="navAuth"></div>
+  <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">🏠 Главная</a>
+  <a href="mistakes.html">❌ Ошибки</a>
+</div>
+
+<div class="container" style="padding:40px 24px">
+  <div class="section-title">❌ Мои <span>ошибки</span></div>
+  <p style="color:var(--text-secondary);margin-bottom:24px">Вопросы, на которые вы ответили неверно. Повторите их для лучшего усвоения.</p>
+
+  <div id="mistakesContent"><div class="loader">⟳</div></div>
+  <div id="startBtn" style="display:none;margin-top:20px">
+    <a href="test.html?mode=mistakes" class="btn btn-accent btn-lg">🔄 Повторить ошибки</a>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="js/app.js"></script>
+<script>
+initNav();
+document.addEventListener('DOMContentLoaded', loadMistakes);
+
+async function loadMistakes() {
+  const el = document.getElementById('mistakesContent');
+  if (!localStorage.getItem('token')) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🔑</div><h3>Требуется авторизация</h3><p>Войдите в аккаунт чтобы видеть ошибки</p><a href="login.html" class="btn btn-primary" style="margin-top:16px">Войти</a></div>`;
+    return;
+  }
+  try {
+    const data = await api('/mistakes/questions');
+    if (!data.length) {
+      el.innerHTML = `<div class="empty-state"><div class="empty-icon">🎉</div><h3>Ошибок нет!</h3><p>Вы отвечаете на все вопросы правильно!</p></div>`;
+      return;
+    }
+    document.getElementById('startBtn').style.display = 'block';
+    el.innerHTML = `<div style="margin-bottom:16px">
+      <span class="badge badge-danger">❌ Ошибок: ${data.length}</span>
+      <button onclick="clearAll()" class="btn btn-sm btn-outline" style="margin-left:12px">🗑 Очистить все</button>
+    </div>` + data.map((q, i) => `
+      <div id="mq${q.id}" style="background:#fff;border-radius:12px;padding:20px;margin-bottom:12px;box-shadow:var(--shadow);border-left:4px solid var(--danger)">
+        <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px">Вопрос ${i+1}</div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:12px">${q.question}</div>
+        <div style="font-size:13px;color:var(--success)">✓ Правильный ответ: ${q['answer'+q.correct_answer]}</div>
+        ${q.description ? `<div style="font-size:13px;color:var(--text-secondary);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">💡 ${q.description}</div>` : ''}
+        <button onclick="removeMistake(${q.id})" class="btn btn-sm btn-outline" style="margin-top:12px">✓ Убрать из ошибок</button>
+      </div>`).join('');
+  } catch(e) {
+    el.innerHTML = `<div class="alert alert-danger">⚠️ ${e.message}</div>`;
+  }
+}
+
+async function removeMistake(qId) {
+  try {
+    await api('/mistakes/remove/' + qId, { method: 'DELETE' });
+    const el = document.getElementById('mq' + qId);
+    if (el) el.remove();
+    showToast('Удалено из ошибок', 'success');
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function clearAll() {
+  if (!confirm('Очистить все ошибки?')) return;
+  try {
+    await api('/mistakes/clear', { method: 'DELETE' });
+    showToast('Все ошибки очищены', 'success');
+    loadMistakes();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+</script>
+</body>
+</html>

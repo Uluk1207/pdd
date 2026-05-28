@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Профиль — ПДД Онлайн</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="nav-logo"><div class="logo-icon">🚗</div>ПДД Онлайн</a>
+  <ul class="nav-menu">
+    <li><a href="index.html">Главная</a></li>
+    <li><a href="tickets.html">Билеты</a></li>
+    <li><a href="exam.html">Экзамен</a></li>
+    <li><a href="marathon.html">Марафон</a></li>
+    <li><a href="mistakes.html">Ошибки</a></li>
+    <li><a href="rating.html">Рейтинг</a></li>
+    <li><a href="profile.html" class="active">Кабинет</a></li>
+  </ul>
+  <div class="nav-right" id="navAuth"></div>
+  <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">🏠 Главная</a>
+  <a href="tickets.html">📋 Билеты</a>
+  <a href="exam.html">📝 Экзамен</a>
+  <a href="profile.html">👤 Кабинет</a>
+</div>
+
+<div class="profile-layout">
+  <!-- Sidebar -->
+  <aside class="profile-sidebar">
+    <div class="profile-avatar" id="pAvatar">?</div>
+    <div class="profile-name" id="pName">Загрузка...</div>
+    <div class="profile-email" id="pEmail"></div>
+    <ul class="profile-nav">
+      <li><a href="#" onclick="showTab('overview')" class="active" id="tabOverview">📊 Обзор</a></li>
+      <li><a href="#" onclick="showTab('history')" id="tabHistory">📋 История тестов</a></li>
+      <li><a href="#" onclick="showTab('mistakes')" id="tabMistakes">❌ Мои ошибки</a></li>
+      <li><a href="#" onclick="showTab('settings')" id="tabSettings">⚙️ Настройки</a></li>
+      <li><a href="#" onclick="logout()" style="color:#C62828">🚪 Выйти</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main -->
+  <main>
+    <!-- OVERVIEW -->
+    <div id="tabContentOverview">
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card blue"><div class="s-num" id="statTotal">0</div><div class="s-lbl">Всего тестов</div></div>
+        <div class="stat-card green"><div class="s-num" id="statAvg">0%</div><div class="s-lbl">Средний результат</div></div>
+        <div class="stat-card red"><div class="s-num" id="statMistakes">0</div><div class="s-lbl">Ошибок</div></div>
+        <div class="stat-card orange"><div class="s-num" id="statBest">0%</div><div class="s-lbl">Лучший результат</div></div>
+      </div>
+
+      <div style="background:#fff;border-radius:12px;padding:24px;box-shadow:var(--shadow);margin-bottom:20px">
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">📈 Прогресс</h3>
+        <div class="progress-wrap">
+          <div class="progress-label"><span>Пройдено билетов</span><span id="ticketProgress">0 / 35</span></div>
+          <div class="progress-bar"><div class="progress-fill" id="ticketFill" style="width:0%"></div></div>
+        </div>
+        <div class="progress-wrap" style="margin-top:16px">
+          <div class="progress-label"><span>Средний балл</span><span id="avgProgress">0%</span></div>
+          <div class="progress-bar"><div class="progress-fill" id="avgFill" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div style="background:#fff;border-radius:12px;padding:24px;box-shadow:var(--shadow)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <h3 style="font-size:16px;font-weight:700">🕐 Последние тесты</h3>
+          <a href="#" onclick="showTab('history')" style="color:var(--primary);font-size:13px;font-weight:600">Все →</a>
+        </div>
+        <div id="recentTests"><div class="loader">⟳</div></div>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div id="tabContentHistory" style="display:none">
+      <div style="background:#fff;border-radius:12px;box-shadow:var(--shadow);overflow:hidden">
+        <div style="padding:20px 24px;border-bottom:2px solid var(--bg);display:flex;justify-content:space-between;align-items:center">
+          <h3 style="font-size:16px;font-weight:700">История тестов</h3>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Дата</th><th>Тест</th><th>Балл</th><th>Верно</th><th>Ошибки</th><th>Результат</th></tr></thead>
+            <tbody id="historyBody"><tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-secondary)">Загрузка...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- MISTAKES -->
+    <div id="tabContentMistakes" style="display:none">
+      <div style="background:#fff;border-radius:12px;padding:24px;box-shadow:var(--shadow)">
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:20px">❌ Вопросы с ошибками</h3>
+        <div id="mistakesContent"><div class="loader">⟳</div></div>
+        <div style="margin-top:16px">
+          <a href="mistakes.html" class="btn btn-primary">🔄 Повторить ошибки</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="tabContentSettings" style="display:none">
+      <div style="background:#fff;border-radius:12px;padding:28px;box-shadow:var(--shadow)">
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:24px">⚙️ Настройки профиля</h3>
+        <div id="settingsAlert"></div>
+        <div class="form-group">
+          <label class="form-label">Имя</label>
+          <input type="text" class="form-input" id="sName" placeholder="Ваше имя">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="sEmail" placeholder="Email">
+        </div>
+        <div style="border-top:2px solid var(--bg);padding-top:20px;margin-top:20px">
+          <h4 style="font-size:14px;font-weight:700;margin-bottom:16px">Изменить пароль</h4>
+          <div class="form-group">
+            <label class="form-label">Текущий пароль</label>
+            <input type="password" class="form-input" id="sOldPass" placeholder="Текущий пароль">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Новый пароль</label>
+            <input type="password" class="form-input" id="sNewPass" placeholder="Новый пароль">
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="saveSettings()">💾 Сохранить</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="js/app.js"></script>
+<script>
+requireAuth();
+initNav();
+
+const user = getUser();
+if (user) {
+  document.getElementById('pAvatar').textContent = user.name.charAt(0).toUpperCase();
+  document.getElementById('pName').textContent = user.name;
+  document.getElementById('pEmail').textContent = user.email;
+  document.getElementById('sName').value = user.name;
+  document.getElementById('sEmail').value = user.email;
+}
+
+document.addEventListener('DOMContentLoaded', loadProfile);
+
+async function loadProfile() {
+  try {
+    const data = await api('/results/my-stats');
+    document.getElementById('statTotal').textContent = data.totalTests || 0;
+    document.getElementById('statAvg').textContent = (data.avgScore || 0) + '%';
+    document.getElementById('statMistakes').textContent = data.totalWrong || 0;
+    document.getElementById('statBest').textContent = (data.bestScore || 0) + '%';
+
+    const tickets = data.ticketsDone || 0;
+    document.getElementById('ticketProgress').textContent = `${tickets} / 35`;
+    document.getElementById('ticketFill').style.width = `${Math.round(tickets/35*100)}%`;
+    document.getElementById('avgProgress').textContent = (data.avgScore || 0) + '%';
+    document.getElementById('avgFill').style.width = `${data.avgScore || 0}%`;
+
+    loadRecent();
+  } catch(e) { console.error(e); }
+}
+
+async function loadRecent() {
+  try {
+    const results = await api('/results/my?limit=5');
+    const el = document.getElementById('recentTests');
+    if (!results.length) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><h3>Тестов ещё нет</h3><p>Пройдите первый тест!</p></div>';
+      return;
+    }
+    el.innerHTML = '<div class="table-wrap"><table><thead><tr><th>Дата</th><th>Тест</th><th>Балл</th><th>Верно/Ошибки</th></tr></thead><tbody>' +
+      results.map(r => `<tr>
+        <td>${new Date(r.date).toLocaleDateString('ru')}</td>
+        <td>${r.title || 'Экзамен'}</td>
+        <td><strong>${r.score}%</strong></td>
+        <td><span class="badge badge-success">✓ ${r.correct}</span> <span class="badge badge-danger">✗ ${r.wrong}</span></td>
+      </tr>`).join('') + '</tbody></table></div>';
+  } catch(e) {
+    document.getElementById('recentTests').innerHTML = '<p style="color:var(--text-secondary);text-align:center;padding:20px">Нет данных</p>';
+  }
+}
+
+async function loadHistory() {
+  try {
+    const results = await api('/results/my?limit=100');
+    const body = document.getElementById('historyBody');
+    if (!results.length) {
+      body.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-secondary)">Нет результатов</td></tr>';
+      return;
+    }
+    body.innerHTML = results.map(r => `<tr>
+      <td>${new Date(r.date).toLocaleDateString('ru')}</td>
+      <td>${r.title || 'Тест'}</td>
+      <td><strong>${r.score}%</strong></td>
+      <td><span class="badge badge-success">✓ ${r.correct}</span></td>
+      <td><span class="badge badge-danger">✗ ${r.wrong}</span></td>
+      <td><span class="badge ${r.score >= 75 ? 'badge-success' : 'badge-danger'}">${r.score >= 75 ? 'Сдан' : 'Не сдан'}</span></td>
+    </tr>`).join('');
+  } catch(e) {}
+}
+
+async function loadMistakes() {
+  try {
+    const data = await api('/mistakes/questions');
+    const el = document.getElementById('mistakesContent');
+    if (!data.length) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-icon">🎉</div><h3>Ошибок нет!</h3><p>Отличный результат!</p></div>';
+      return;
+    }
+    el.innerHTML = `<p style="color:var(--text-secondary);margin-bottom:16px">Найдено вопросов с ошибками: <strong>${data.length}</strong></p>` +
+      data.slice(0,5).map(q => `
+        <div style="padding:14px;background:var(--bg);border-radius:8px;margin-bottom:10px;border-left:4px solid var(--danger)">
+          <div style="font-size:14px;font-weight:600;margin-bottom:6px">${q.question}</div>
+          <div style="font-size:12px;color:var(--success)">✓ Правильный ответ: ${q['answer'+q.correct_answer]}</div>
+        </div>`).join('');
+  } catch(e) {}
+}
+
+function showTab(tab) {
+  ['overview','history','mistakes','settings'].forEach(t => {
+    document.getElementById('tabContent' + t.charAt(0).toUpperCase() + t.slice(1)).style.display = 'none';
+    const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+    if (btn) btn.classList.remove('active');
+  });
+  document.getElementById('tabContent' + tab.charAt(0).toUpperCase() + tab.slice(1)).style.display = 'block';
+  const btn = document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1));
+  if (btn) btn.classList.add('active');
+
+  if (tab === 'history') loadHistory();
+  if (tab === 'mistakes') loadMistakes();
+  return false;
+}
+
+async function saveSettings() {
+  const name = document.getElementById('sName').value.trim();
+  const email = document.getElementById('sEmail').value.trim();
+  const oldPass = document.getElementById('sOldPass').value;
+  const newPass = document.getElementById('sNewPass').value;
+  try {
+    await api('/auth/update', { method: 'PUT', body: JSON.stringify({ name, email, oldPass, newPass }) });
+    const user = getUser();
+    user.name = name; user.email = email;
+    localStorage.setItem('user', JSON.stringify(user));
+    document.getElementById('pName').textContent = name;
+    document.getElementById('pEmail').textContent = email;
+    document.getElementById('pAvatar').textContent = name.charAt(0).toUpperCase();
+    document.getElementById('settingsAlert').innerHTML = '<div class="alert alert-success">✅ Сохранено успешно</div>';
+    showToast('Профиль обновлён', 'success');
+  } catch(e) {
+    document.getElementById('settingsAlert').innerHTML = `<div class="alert alert-danger">⚠️ ${e.message}</div>`;
+  }
+}
+</script>
+</body>
+</html>

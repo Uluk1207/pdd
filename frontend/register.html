@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Регистрация — ПДД Онлайн</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-card" style="max-width:460px">
+    <div class="auth-logo">
+      <div class="logo-big">🚗</div>
+      <h2>Регистрация</h2>
+      <p>Создайте аккаунт для отслеживания прогресса</p>
+    </div>
+
+    <div id="alertBox"></div>
+
+    <div class="form-group">
+      <label class="form-label">Имя</label>
+      <input type="text" class="form-input" id="name" placeholder="Ваше имя">
+      <div class="form-error" id="nameErr">Введите имя</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" class="form-input" id="email" placeholder="example@mail.ru">
+      <div class="form-error" id="emailErr">Введите корректный email</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Логин</label>
+      <input type="text" class="form-input" id="login" placeholder="Латинские буквы, без пробелов">
+      <div class="form-error" id="loginErr">Логин от 3 символов</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Пароль</label>
+      <input type="password" class="form-input" id="password" placeholder="Минимум 6 символов">
+      <div class="form-error" id="passErr">Пароль от 6 символов</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Подтвердите пароль</label>
+      <input type="password" class="form-input" id="password2" placeholder="Повторите пароль">
+      <div class="form-error" id="pass2Err">Пароли не совпадают</div>
+    </div>
+
+    <button class="btn btn-primary btn-full" onclick="doRegister()" id="regBtn">
+      ✅ Зарегистрироваться
+    </button>
+
+    <div class="auth-link" style="margin-top:16px">
+      Уже есть аккаунт? <a href="login.html">Войти</a>
+    </div>
+    <div class="auth-link">
+      <a href="index.html">← На главную</a>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+if (localStorage.getItem('token')) window.location.href = 'index.html';
+
+function clearErrors() {
+  ['name','email','login','pass','pass2'].forEach(id => {
+    const err = document.getElementById(id + 'Err');
+    if (err) err.classList.remove('show');
+  });
+  document.querySelectorAll('.form-input').forEach(i => i.classList.remove('error'));
+}
+
+async function doRegister() {
+  clearErrors();
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const login = document.getElementById('login').value.trim();
+  const password = document.getElementById('password').value;
+  const password2 = document.getElementById('password2').value;
+  let ok = true;
+
+  if (!name) { showErr('name', 'nameErr'); ok = false; }
+  if (!email || !/\S+@\S+\.\S+/.test(email)) { showErr('email', 'emailErr'); ok = false; }
+  if (login.length < 3) { showErr('login', 'loginErr'); ok = false; }
+  if (password.length < 6) { showErr('password', 'passErr'); ok = false; }
+  if (password !== password2) { showErr('password2', 'pass2Err'); ok = false; }
+  if (!ok) return;
+
+  const btn = document.getElementById('regBtn');
+  btn.textContent = 'Регистрация...'; btn.disabled = true;
+
+  try {
+    const data = await api('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ name, email, login, password })
+    });
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    window.location.href = 'profile.html';
+  } catch(e) {
+    document.getElementById('alertBox').innerHTML = `<div class="alert alert-danger">⚠️ ${e.message}</div>`;
+    btn.textContent = '✅ Зарегистрироваться'; btn.disabled = false;
+  }
+}
+
+function showErr(inputId, errId) {
+  document.getElementById(inputId).classList.add('error');
+  document.getElementById(errId).classList.add('show');
+}
+</script>
+</body>
+</html>

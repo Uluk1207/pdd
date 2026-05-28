@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Билеты ПДД — ПДД Онлайн</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="nav-logo"><div class="logo-icon">🚗</div>ПДД Онлайн</a>
+  <ul class="nav-menu">
+    <li><a href="index.html">Главная</a></li>
+    <li><a href="tickets.html" class="active">Билеты</a></li>
+    <li><a href="topics.html">Темы</a></li>
+    <li><a href="exam.html">Экзамен</a></li>
+    <li><a href="marathon.html">Марафон</a></li>
+    <li><a href="mistakes.html">Ошибки</a></li>
+    <li><a href="rating.html">Рейтинг</a></li>
+    <li><a href="profile.html">Кабинет</a></li>
+  </ul>
+  <div class="nav-right" id="navAuth"></div>
+  <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">🏠 Главная</a>
+  <a href="tickets.html">📋 Билеты</a>
+  <a href="exam.html">📝 Экзамен</a>
+</div>
+
+<div class="container" style="padding-top:32px;padding-bottom:40px">
+  <div class="section-title">📋 Билеты <span>ПДД</span></div>
+  <p style="color:var(--text-secondary);margin-bottom:28px;font-size:15px">Выберите билет для изучения. Каждый билет содержит 20 вопросов.</p>
+  <div class="tickets-grid" id="ticketsGrid">
+    <div class="loader">⟳</div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="js/app.js"></script>
+<script>
+initNav();
+document.addEventListener('DOMContentLoaded', loadTickets);
+
+async function loadTickets() {
+  try {
+    const tests = await api('/tests?category=ticket');
+    const el = document.getElementById('ticketsGrid');
+
+    // Если тестов нет — показываем 35 заглушек
+    const items = tests.length ? tests : Array.from({length:35}, (_,i) => ({id:i+1, title:`Билет ${i+1}`, category:'ticket'}));
+
+    el.innerHTML = items.map((t, i) => `
+      <div class="ticket-card" onclick="window.location='test.html?id=${t.id}&mode=ticket'">
+        <div class="t-num">${i+1}</div>
+        <div class="t-lbl">Билет ${i+1}</div>
+        <div style="font-size:11px;color:var(--text-light);margin-top:6px">20 вопросов</div>
+      </div>
+    `).join('');
+  } catch(e) {
+    document.getElementById('ticketsGrid').innerHTML = '<p style="color:var(--danger)">Ошибка загрузки. Запустите сервер.</p>';
+  }
+}
+</script>
+</body>
+</html>

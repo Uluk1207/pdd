@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Марафон — ПДД Онлайн</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="nav-logo"><div class="logo-icon">🚗</div>ПДД Онлайн</a>
+  <ul class="nav-menu">
+    <li><a href="index.html">Главная</a></li>
+    <li><a href="tickets.html">Билеты</a></li>
+    <li><a href="exam.html">Экзамен</a></li>
+    <li><a href="marathon.html" class="active">Марафон</a></li>
+  </ul>
+  <div class="nav-right" id="navAuth"></div>
+  <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">🏠 Главная</a>
+  <a href="marathon.html">🏃 Марафон</a>
+</div>
+
+<div class="container" style="padding:60px 24px;text-align:center">
+  <div style="font-size:80px;margin-bottom:20px">🏃</div>
+  <h1 style="font-size:32px;font-weight:800;margin-bottom:16px">Марафон</h1>
+  <p style="font-size:16px;color:var(--text-secondary);max-width:480px;margin:0 auto 40px">
+    Все вопросы из базы данных по порядку. Без ограничения времени. Отличный способ изучить все ПДД целиком.
+  </p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;max-width:400px;margin:0 auto 40px">
+    <div style="background:#E3F2FD;border-radius:12px;padding:20px;text-align:center">
+      <div style="font-size:28px;font-weight:800;color:var(--primary)">700+</div>
+      <div style="font-size:13px;color:var(--text-secondary);margin-top:4px">Вопросов</div>
+    </div>
+    <div style="background:#E8F5E9;border-radius:12px;padding:20px;text-align:center">
+      <div style="font-size:28px;font-weight:800;color:var(--success)">∞</div>
+      <div style="font-size:13px;color:var(--text-secondary);margin-top:4px">Без таймера</div>
+    </div>
+  </div>
+  <a href="test.html?mode=marathon" class="btn btn-accent btn-lg">🏃 Начать марафон</a>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="js/app.js"></script>
+<script>initNav();</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Темы ПДД — ПДД Онлайн</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="nav-logo"><div class="logo-icon">🚗</div>ПДД Онлайн</a>
+  <ul class="nav-menu">
+    <li><a href="index.html">Главная</a></li>
+    <li><a href="tickets.html">Билеты</a></li>
+    <li><a href="topics.html" class="active">Темы</a></li>
+    <li><a href="exam.html">Экзамен</a></li>
+  </ul>
+  <div class="nav-right" id="navAuth"></div>
+  <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">🏠 Главная</a>
+  <a href="topics.html">📚 Темы</a>
+</div>
+
+<div class="container" style="padding:40px 24px">
+  <div class="section-title">📚 Темы <span>ПДД</span></div>
+  <div class="topics-list" id="topicsList"></div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="js/app.js"></script>
+<script>
+initNav();
+const TOPICS = [
+  { icon:'⚠️', name:'Общие положения', sub:'Термины и определения' },
+  { icon:'🚦', name:'Дорожные знаки', sub:'Виды знаков и их значения' },
+  { icon:'🛣️', name:'Разметка', sub:'Горизонтальная и вертикальная' },
+  { icon:'🚗', name:'Обгон и опережение', sub:'Правила обгона' },
+  { icon:'🅿️', name:'Остановка и стоянка', sub:'Где разрешено и запрещено' },
+  { icon:'🛑', name:'Приоритет', sub:'Право преимущественного проезда' },
+  { icon:'💡', name:'Световые приборы', sub:'Применение фар и сигналов' },
+  { icon:'🔄', name:'Перекрёстки', sub:'Правила проезда перекрёстков' },
+  { icon:'🚶', name:'Пешеходы', sub:'Права и обязанности пешеходов' },
+  { icon:'🚲', name:'Велосипеды и мопеды', sub:'Особые требования' },
+  { icon:'🚌', name:'Общественный транспорт', sub:'Остановки и проезд' },
+  { icon:'🛤️', name:'Дорога и её элементы', sub:'Части дороги и их назначение' },
+];
+
+const el = document.getElementById('topicsList');
+TOPICS.forEach((t, i) => {
+  el.innerHTML += `<div class="topic-item" onclick="window.location='test.html?mode=topic&id=${encodeURIComponent(t.name)}'">
+    <div class="topic-icon">${t.icon}</div>
+    <div class="topic-info"><h4>${t.name}</h4><div class="t-sub">${t.sub}</div></div>
+    <div class="topic-arrow">›</div>
+  </div>`;
+});
+</script>
+</body>
+</html>

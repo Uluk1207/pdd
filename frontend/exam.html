@@ -1,0 +1,56 @@
+<!-- EXAM -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Экзамен ПДД — ПДД Онлайн</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="nav-logo"><div class="logo-icon">🚗</div>ПДД Онлайн</a>
+  <ul class="nav-menu">
+    <li><a href="index.html">Главная</a></li>
+    <li><a href="tickets.html">Билеты</a></li>
+    <li><a href="exam.html" class="active">Экзамен</a></li>
+    <li><a href="marathon.html">Марафон</a></li>
+  </ul>
+  <div class="nav-right" id="navAuth"></div>
+  <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html">🏠 Главная</a>
+  <a href="exam.html">📝 Экзамен</a>
+</div>
+
+<div class="container" style="padding:60px 24px;text-align:center">
+  <div style="font-size:80px;margin-bottom:20px">📝</div>
+  <h1 style="font-size:32px;font-weight:800;margin-bottom:16px">Экзамен ПДД</h1>
+  <p style="font-size:16px;color:var(--text-secondary);max-width:480px;margin:0 auto 40px">
+    20 случайных вопросов из всех билетов. Время: 25 минут. Для сдачи нужно ≥75% правильных ответов (15 из 20).
+  </p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;max-width:600px;margin:0 auto 40px">
+    <div style="background:#E3F2FD;border-radius:12px;padding:20px;text-align:center">
+      <div style="font-size:28px;font-weight:800;color:var(--primary)">20</div>
+      <div style="font-size:13px;color:var(--text-secondary);margin-top:4px">Вопросов</div>
+    </div>
+    <div style="background:#E8F5E9;border-radius:12px;padding:20px;text-align:center">
+      <div style="font-size:28px;font-weight:800;color:var(--success)">25 мин</div>
+      <div style="font-size:13px;color:var(--text-secondary);margin-top:4px">Время</div>
+    </div>
+    <div style="background:#FFF3E0;border-radius:12px;padding:20px;text-align:center">
+      <div style="font-size:28px;font-weight:800;color:var(--accent)">75%</div>
+      <div style="font-size:13px;color:var(--text-secondary);margin-top:4px">Для сдачи</div>
+    </div>
+  </div>
+
+  <a href="test.html?mode=exam" class="btn btn-accent btn-lg">🚀 Начать экзамен</a>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="js/app.js"></script>
+<script>initNav();</script>
+</body>
+</html>

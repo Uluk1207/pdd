@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Вход — ПДД Онлайн</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-big">🚗</div>
+      <h2>ПДД Онлайн</h2>
+      <p>Войдите в свой аккаунт</p>
+    </div>
+
+    <div id="alertBox"></div>
+
+    <div class="form-group">
+      <label class="form-label">Логин или Email</label>
+      <input type="text" class="form-input" id="login" placeholder="Введите логин или email">
+      <div class="form-error" id="loginErr">Введите логин</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Пароль</label>
+      <input type="password" class="form-input" id="password" placeholder="Введите пароль">
+      <div class="form-error" id="passErr">Введите пароль</div>
+    </div>
+
+    <button class="btn btn-primary btn-full" onclick="doLogin()" id="loginBtn">
+      🔑 Войти
+    </button>
+
+    <div class="auth-link" style="margin-top:16px">
+      Нет аккаунта? <a href="register.html">Зарегистрироваться</a>
+    </div>
+    <div class="auth-link">
+      <a href="index.html">← На главную</a>
+    </div>
+
+    <div style="margin-top:20px;padding:14px;background:#F0F4F8;border-radius:8px;font-size:12px;color:#546E7A">
+      <strong>Демо админ:</strong> admin / admin123<br>
+      <strong>Демо пользователь:</strong> user / user123
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+if (localStorage.getItem('token')) window.location.href = 'index.html';
+
+async function doLogin() {
+  const login = document.getElementById('login').value.trim();
+  const password = document.getElementById('password').value;
+  let ok = true;
+
+  document.getElementById('loginErr').classList.remove('show');
+  document.getElementById('passErr').classList.remove('show');
+  document.getElementById('login').classList.remove('error');
+  document.getElementById('password').classList.remove('error');
+
+  if (!login) {
+    document.getElementById('loginErr').classList.add('show');
+    document.getElementById('login').classList.add('error');
+    ok = false;
+  }
+  if (!password) {
+    document.getElementById('passErr').classList.add('show');
+    document.getElementById('password').classList.add('error');
+    ok = false;
+  }
+  if (!ok) return;
+
+  const btn = document.getElementById('loginBtn');
+  btn.textContent = 'Вход...'; btn.disabled = true;
+
+  try {
+    const data = await api('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ login, password })
+    });
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    if (data.user.role === 'admin') {
+      window.location.href = 'admin.html';
+    } else {
+      window.location.href = 'profile.html';
+    }
+  } catch (e) {
+    document.getElementById('alertBox').innerHTML = `<div class="alert alert-danger">⚠️ ${e.message}</div>`;
+    btn.textContent = '🔑 Войти'; btn.disabled = false;
+  }
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+</script>
+</body>
+</html>

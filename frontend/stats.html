@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Статистика — ПДД Онлайн</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html" class="nav-logo"><div class="logo-icon">🚗</div>ПДД Онлайн</a>
+  <ul class="nav-menu">
+    <li><a href="index.html">Главная</a></li>
+    <li><a href="tickets.html">Билеты</a></li>
+    <li><a href="stats.html" class="active">Статистика</a></li>
+    <li><a href="rating.html">Рейтинг</a></li>
+  </ul>
+  <div class="nav-right" id="navAuth"></div>
+  <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+</nav>
+<div class="mobile-menu" id="mobileMenu"><a href="index.html">🏠 Главная</a></div>
+
+<div class="container" style="padding:40px 24px">
+  <div class="section-title">📊 Моя <span>статистика</span></div>
+  <div id="statsContent"><div class="loader">⟳</div></div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+<script src="js/app.js"></script>
+<script>
+initNav();
+document.addEventListener('DOMContentLoaded', async () => {
+  const el = document.getElementById('statsContent');
+  if (!localStorage.getItem('token')) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🔑</div><h3>Требуется авторизация</h3><a href="login.html" class="btn btn-primary" style="margin-top:16px">Войти</a></div>`;
+    return;
+  }
+  try {
+    const data = await api('/results/my-stats');
+    el.innerHTML = `
+      <div class="stats-grid">
+        <div class="stat-card blue"><div class="s-num">${data.totalTests||0}</div><div class="s-lbl">Пройдено тестов</div></div>
+        <div class="stat-card green"><div class="s-num">${data.avgScore||0}%</div><div class="s-lbl">Средний балл</div></div>
+        <div class="stat-card orange"><div class="s-num">${data.bestScore||0}%</div><div class="s-lbl">Лучший результат</div></div>
+        <div class="stat-card red"><div class="s-num">${data.totalWrong||0}</div><div class="s-lbl">Всего ошибок</div></div>
+      </div>
+      <div style="background:#fff;border-radius:12px;padding:24px;box-shadow:var(--shadow);margin-top:24px">
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">📈 Прогресс</h3>
+        <div class="progress-wrap">
+          <div class="progress-label"><span>Средний балл</span><span>${data.avgScore||0}%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${data.avgScore||0}%"></div></div>
+        </div>
+        <div class="progress-wrap" style="margin-top:16px">
+          <div class="progress-label"><span>Правильных ответов</span><span>${data.totalCorrect||0}</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${data.totalTests ? Math.round(data.totalCorrect/(data.totalCorrect+data.totalWrong)*100)||0 : 0}%"></div></div>
+        </div>
+      </div>`;
+  } catch(e) { el.innerHTML = `<div class="alert alert-danger">⚠️ ${e.message}</div>`; }
+});
+</script>
+</body>
+</html>
