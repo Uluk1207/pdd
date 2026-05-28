@@ -6,7 +6,7 @@ const { initDb } = require('./models/db');
 const initDB = require('./models/init');
 
 const app = express();
-const PORT = 3000;
+const PORT = 10000;
 
 app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json());
